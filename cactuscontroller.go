@@ -14,7 +14,7 @@ import (
 
 const (
 	Perms = 251968
-	ClientID = "237605108173635584"
+	ClientID = "565946505026863145"
 	InvURL = "https://discordapp.com/oauth2/authorize?&client_id=%v&scope=bot&permissions=%v"
 	RepoURL = "https://github.com/willeccles/cactusbot"
 	DebugChannel = "245649734302302208"
