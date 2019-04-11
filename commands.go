@@ -57,4 +57,10 @@ var Commands = []Command {
 		Pattern: regexp.MustCompile(`(?i)^cc\s+restart`),
 		Handler: restarthandler,
 	},
+	{
+		Name: "log",
+		Description: "Prints the last 15 log messages from the bot.",
+		Pattern: regexp.MustCompile(`(?i)^cc\s+log`),
+		Handler: loghandler,
+	},
 }

@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/bwmarrin/discordgo"
 	"log"
+	"strings"
+	"fmt"
 )
 
 func shutdownhandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
@@ -91,4 +93,11 @@ func restarthandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
 		}
 	}
 
+}
+
+func loghandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
+	_, err := s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n%v\n```", strings.Join(ProcLog, "")))
+	if err != nil {
+		log.Printf("Error in loghandler:\n%v\n", err)
+	}
 }

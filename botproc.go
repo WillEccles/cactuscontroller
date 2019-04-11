@@ -11,7 +11,7 @@ import (
 var BotCmd *exec.Cmd
 var BotStatus int
 var CanCommand bool // whether or not admin commands can be handled at the moment
-var proclog []string
+var ProcLog []string
 
 const (
 	BotRunning = 1 << 0
@@ -24,10 +24,10 @@ const MaxOutputBuffer = 15
 type BotWriter struct {}
 
 func (bw BotWriter) Write(p []byte) (n int, err error) {
-	if len(proclog) != MaxOutputBuffer {
-		proclog = append(proclog, string(p))
+	if len(ProcLog) != MaxOutputBuffer {
+		ProcLog = append(ProcLog, string(p))
 	} else {
-		proclog = append(proclog[1:], string(p))
+		ProcLog = append(ProcLog[1:], string(p))
 	}
 	fmt.Print(string(p))
 	n = len(p)
@@ -42,7 +42,7 @@ func StartBot() {
 	BotCmd = exec.Command("./cactusbot", "-t", BotToken)
 	BotCmd.Dir = "../cactusbot/"
 
-	proclog = nil
+	ProcLog = nil
 
 	BotCmd.Stdout = BotWriter{}
 	BotCmd.Stderr = BotWriter{}
