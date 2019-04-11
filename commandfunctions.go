@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"github.com/bwmarrin/discordgo"
 	"regexp"
@@ -10,6 +11,7 @@ import (
 	"strconv"
 	"syscall"
 )
+
 
 func oodlehandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
 	re := regexp.MustCompile(`(?i)^c(actus)?\s+oodle\s+`)
@@ -172,3 +174,4 @@ func xkcdhandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
 		log.Printf("Error in xkcdhandler:\n%v\n", err)
 	}
 }
+*/

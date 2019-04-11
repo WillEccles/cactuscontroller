@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	Perms = 251968
+	/*Perms = 8 // admin
 	ClientID = "565946505026863145"
-	InvURL = "https://discordapp.com/oauth2/authorize?&client_id=%v&scope=bot&permissions=%v"
-	RepoURL = "https://github.com/willeccles/cactusbot"
+	InvURL = "https://discordapp.com/oauth2/authorize?&client_id=%v&scope=bot&permissions=%v"*/
+	ConsoleChannel = "565947628718915587"
 	DebugChannel = "245649734302302208"
 	AdminID = "111943010396229632"
 )
@@ -31,21 +31,19 @@ var HelpEmbed discordgo.MessageEmbed
 var SigChan chan os.Signal
 
 func main() {
+	log.SetPrefix("[Controller] ")
+
 	if token == "" {
-		fmt.Println("No token provided. Please run: cactusbot -t <token>")
+		fmt.Println("No token provided. Please run: cactuscontroller -t <token>")
 		return
 	}
 
 	// prepare a help embed to reduce CPU load later on
 	HelpEmbed.Title = "**Here's what I can do!**"
-	HelpEmbed.Description = "You should begin each command with `cactus` or simply `c`.\nFor example: `cactus help` or `c help`."
+	HelpEmbed.Description = "You should begin each command with `cc`.\nFor example: `cc upgrade`."
 
+	/*
 	for _, cmd := range(Commands) {
-		// only show non-admin commands
-		if cmd.AdminOnly {
-			continue
-		}
-
 		newfield := discordgo.MessageEmbedField{
 			Name: "**`" + cmd.Name + "`**",
 			Value: cmd.Description,
@@ -65,7 +63,7 @@ func main() {
 			}
 		}
 		HelpEmbed.Fields = append(HelpEmbed.Fields, &newfield)
-	}
+	}*/
 
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
@@ -87,14 +85,14 @@ func main() {
 	defer fmt.Println("\nGoodbye.")
 	defer dg.Close() // close the session after Control-C
 
-	fmt.Println("Cactusbot is now running. Press Control+C to exit.")
+	fmt.Println("Controller is now running. Press Control+C to exit.")
 	SigChan = make(chan os.Signal, 1)
 	signal.Notify(SigChan, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-SigChan
 }
 
 func ready(s *discordgo.Session, event *discordgo.Ready) {
-	log.Println("Client ready.")
+	log.Println("Controller ready.")
 
 	// set the status to "watching you"
 	i := 0
@@ -103,7 +101,7 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 		AFK: false,
 		Status: "online",
 		Game: &discordgo.Game {
-			Name: "you ÒwÓ",
+			Name: "over cactusbot",
 			Type: discordgo.GameTypeWatching,
 		},
 	}
@@ -115,29 +113,30 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// ignore the bot's own messages
-	if m.Author.ID == s.State.User.ID {
+	// only listen to me
+	if m.Author.ID != AdminID {
 		return
 	}
 
+	/*
 	for _, cmd := range(Commands) {
 		if cmd.Pattern.MatchString(m.Content) {
 			cmd.Handle(m, s)
 			break
 		}
-	}
+	}*/
 }
 
 func connect(s *discordgo.Session, event *discordgo.Connect) {
-	log.Println("Client connected.")
+	log.Println("Controller connected.")
 }
 
 func disconnect(s *discordgo.Session, event *discordgo.Disconnect) {
-	log.Println("Client disconnected!")
+	log.Println("Controller disconnected!")
 }
 
 func resume(s *discordgo.Session, event *discordgo.Resumed) {
-	log.Println("Resumed, attempting to send debug message.")
+	log.Println("Controller resumed, attempting to send debug message.")
 	_, err := s.ChannelMessageSend(DebugChannel, fmt.Sprintf("Just recovered from error(s)! <@%v>\n```\n%v\n```", AdminID, strings.Join(event.Trace, "\n")))
 	if err != nil {
 		log.Printf("Error in resume (this is awkward):\n%v\n", err)
