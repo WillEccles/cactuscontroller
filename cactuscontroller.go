@@ -42,7 +42,6 @@ func main() {
 	HelpEmbed.Title = "**Here's what I can do!**"
 	HelpEmbed.Description = "You should begin each command with `cc`.\nFor example: `cc upgrade`."
 
-	/*
 	for _, cmd := range(Commands) {
 		newfield := discordgo.MessageEmbedField{
 			Name: "**`" + cmd.Name + "`**",
@@ -63,7 +62,7 @@ func main() {
 			}
 		}
 		HelpEmbed.Fields = append(HelpEmbed.Fields, &newfield)
-	}*/
+	}
 
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
@@ -114,17 +113,16 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// only listen to me
-	if m.Author.ID != AdminID {
+	if m.Author.ID != AdminID || m.ChannelID != ConsoleChannel {
 		return
 	}
 
-	/*
 	for _, cmd := range(Commands) {
 		if cmd.Pattern.MatchString(m.Content) {
 			cmd.Handle(m, s)
 			break
 		}
-	}*/
+	}
 }
 
 func connect(s *discordgo.Session, event *discordgo.Connect) {
