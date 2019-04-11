@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"fmt"
 	"syscall"
+	"github.com/bwmarrin/discordgo"
 )
 
 var BotCmd *exec.Cmd
@@ -80,6 +81,38 @@ func RestartBot() {
 
 func EndProc() {
 	StopBot()
+}
+
+// this one requires inputs to allow logging in the discord channel
+func UpdateBot(msg *discordgo.MessageCreate, s *discordgo.Session) {
+	gitcomm := exec.Command("git", "pull")
+	gitcomm.Dir = "../cactusbot/"
+
+	bytes, err := gitcomm.CombinedOutput()
+	if err != nil {
+		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git clone\n%v\n```\n**Failed.** Restarting bot.", string(bytes)))
+		StartBot()
+		return
+	}
+	
+	s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git clone\n%v\n```\n", string(bytes)))
+
+	gocomm := exec.Command("go", "build")
+	gocomm.Dir = "../cactusbot/"
+
+	bytes, err = gocomm.CombinedOutput()
+	if err != nil {
+		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ go build\n%v\n```\n**Failed!** You'll need to fix it and try again.", string(bytes)))
+		return
+	}
+
+	s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ go build\n%v\n```\n", string(bytes)))
+
+	s.ChannelMessageSend(msg.ChannelID, "Succeeded in pulling and building, starting bot.")
+
+	StartBot()
+
+	s.ChannelMessageSend(msg.ChannelID, "Bot is started.")
 }
 
 var initialized bool

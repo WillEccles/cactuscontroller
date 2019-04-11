@@ -30,11 +30,11 @@ func shutdownhandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
 }
 
 func updatehandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
-	// TODO
-	_, err := s.ChannelMessageSend(msg.ChannelID, "update")
-	if err != nil {
-		log.Printf("Error in updatehandler:\n%v\n", err)
+	if BotStatus == BotRunning {
+		shutdownhandler(msg, s)
 	}
+
+	UpdateBot(msg, s)
 }
 
 func starthandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
