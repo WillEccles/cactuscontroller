@@ -16,7 +16,14 @@ type Command struct {
 }
 
 func (cmd *Command) Handle(msg *discordgo.MessageCreate, s *discordgo.Session) {
+	if !CanCommand {
+		return
+	}
+	CanCommand = false
+
 	cmd.Handler(msg, s)
+
+	CanCommand = true
 }
 
 var Commands = []Command {

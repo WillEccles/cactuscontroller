@@ -19,24 +19,37 @@ const (
 	ConsoleChannel = "565947628718915587"
 	DebugChannel = "245649734302302208"
 	AdminID = "111943010396229632"
+	BotID = "237605108173635584"
+	AdminGuild = "111944249544564736"
 )
 
 func init() {
-	flag.StringVar(&token, "t", "", "Bot Token")
+	flag.StringVar(&token, "t", "", "Controller Token")
+	flag.StringVar(&BotToken, "b", "", "Bot Token")
 	flag.Parse()
 }
 
 var token string
+var BotToken string
 var HelpEmbed discordgo.MessageEmbed
 var SigChan chan os.Signal
+var firstReady bool
 
 func main() {
 	log.SetPrefix("[Controller] ")
+	firstReady = true
 
 	if token == "" {
-		fmt.Println("No token provided. Please run: cactuscontroller -t <token>")
+		log.Println("No controller token provided. Please run: cactuscontroller -t <controllertoken> -b <bottoken>")
 		return
 	}
+
+	if BotToken == "" {
+		log.Println("No child token supplied. Please run: cactuscontroller -t <controllertoken> -b <bottoken>")
+		return
+	}
+
+	InitProc()
 
 	// prepare a help embed to reduce CPU load later on
 	HelpEmbed.Title = "**Here's what I can do!**"
@@ -81,11 +94,12 @@ func main() {
 		log.Println("Error opening Discord session: ", err)
 		return
 	}
-	defer fmt.Println("\nGoodbye.")
+	defer log.Println("Goodbye.")
 	defer dg.Close() // close the session after Control-C
+	defer EndProc()
 
-	fmt.Println("Controller is now running. Press Control+C to exit.")
-	SigChan = make(chan os.Signal, 1)
+	log.Println("Controller is now running. Press Control+C to exit.")
+	SigChan = make(chan os.Signal)
 	signal.Notify(SigChan, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-SigChan
 }
@@ -93,7 +107,6 @@ func main() {
 func ready(s *discordgo.Session, event *discordgo.Ready) {
 	log.Println("Controller ready.")
 
-	// set the status to "watching you"
 	i := 0
 	usd := discordgo.UpdateStatusData{
 		IdleSince: &i,
@@ -108,6 +121,13 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 	err := s.UpdateStatusComplex(usd)
 	if err != nil {
 		log.Printf("Error in ready:\n%v\n", err)
+	}
+
+	if firstReady {
+		firstReady = false
+
+		// start the bot since we know we should now
+		StartBot()
 	}
 }
 
