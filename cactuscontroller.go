@@ -36,7 +36,6 @@ var SigChan chan os.Signal
 var firstReady bool
 
 func main() {
-	log.SetPrefix("[Controller] ")
 	firstReady = true
 
 	if token == "" {

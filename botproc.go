@@ -11,28 +11,12 @@ import (
 var BotCmd *exec.Cmd
 var BotStatus int
 var CanCommand bool // whether or not admin commands can be handled at the moment
-var ProcLog []string
 
 const (
 	BotRunning = 1 << 0
 	BotStopped = 1 << 1
 	BotStopping = 1 << 2
 )
-
-const MaxOutputBuffer = 15
-
-type BotWriter struct {}
-
-func (bw BotWriter) Write(p []byte) (n int, err error) {
-	if len(ProcLog) != MaxOutputBuffer {
-		ProcLog = append(ProcLog, string(p))
-	} else {
-		ProcLog = append(ProcLog[1:], string(p))
-	}
-	fmt.Print(string(p))
-	n = len(p)
-	return
-}
 
 func StartBot() {
 	if BotStatus == BotRunning {
@@ -53,6 +37,7 @@ func StartBot() {
 	}
 
 	BotStatus = BotRunning
+	log.Println("Started bot process.")
 }
 
 func StopBot() {
@@ -72,47 +57,18 @@ func StopBot() {
 	}
 
 	BotStatus = BotStopped
+	log.Println("Bot process stopped.")
 }
 
 func RestartBot() {
+	log.Println("Restarting bot process.")
 	StopBot()
 	StartBot()
 }
 
 func EndProc() {
 	StopBot()
-}
-
-// this one requires inputs to allow logging in the discord channel
-func UpdateBot(msg *discordgo.MessageCreate, s *discordgo.Session) {
-	gitcomm := exec.Command("git", "pull")
-	gitcomm.Dir = "../cactusbot/"
-
-	bytes, err := gitcomm.CombinedOutput()
-	if err != nil {
-		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git pull\n%v\n```\n**Failed.** Restarting bot.", string(bytes)))
-		StartBot()
-		return
-	}
-	
-	s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git clone\n%v\n```\n", string(bytes)))
-
-	gocomm := exec.Command("go", "build")
-	gocomm.Dir = "../cactusbot/"
-
-	bytes, err = gocomm.CombinedOutput()
-	if err != nil {
-		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ go build\n%v\n```\n**Failed!** You'll need to fix it and try again.", string(bytes)))
-		return
-	}
-
-	s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ go build\n%v\n```\n", string(bytes)))
-
-	s.ChannelMessageSend(msg.ChannelID, "Succeeded in pulling and building, starting bot.")
-
-	StartBot()
-
-	s.ChannelMessageSend(msg.ChannelID, "Bot is started.")
+	log.Println("Cleaned up bot process.")
 }
 
 var initialized bool

@@ -58,9 +58,9 @@ var Commands = []Command {
 		Handler: restarthandler,
 	},
 	{
-		Name: "log",
-		Description: "Prints the last 15 log messages from the bot.",
-		Pattern: regexp.MustCompile(`(?i)^cc\s+log`),
+		Name: "log <option>",
+		Description: "`<option>` can be one of:\n- `bot`: shows the last 40 bot log messages\n- `controller`: shows the last 40 lines of controller logs\n- `all`: shows the last 40 bot log messages, followed by the last 40 controller log messages\n- `<none>`: same as `all`",
+		Pattern: regexp.MustCompile(`(?i)^cc\s+log(\s+(bot|controller|all))?`),
 		Handler: loghandler,
 	},
 }
