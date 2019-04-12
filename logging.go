@@ -9,7 +9,9 @@ const MaxLogBuffer = 40 // max lines of controller/bot logs to store (each)
 const CharacterLimit = 2000 // max message length on discord
 
 type BotWriter struct {}
-type UtilWriter struct {}
+type UtilWriter struct {
+	Log *[]string
+}
 type ControllerLogger struct {}
 
 var ProcLog []string
@@ -28,11 +30,12 @@ func (bw BotWriter) Write(p []byte) (n int, err error) {
 
 func (uw UtilWriter) Write(p []byte) (n int, err error) {
 	if len(ControllerLog) != MaxLogBuffer {
-		ControllerLog = append(ControllerLog, string(p))
+		ControllerLog = append(ControllerLog, "  " + string(p))
 	} else {
-		ControllerLog = append(ControllerLog[1:], string(p))
+		ControllerLog = append(ControllerLog[1:], "  " + string(p))
 	}
 	fmt.Printf("  %s", string(p))
+	*(uw.Log) = append(*(uw.Log), string(p))
 	n = len(p)
 	return
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"errors"
+	"strings"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -42,55 +43,24 @@ func UpdateBot(msg *discordgo.MessageCreate, s *discordgo.Session) {
 	StartBot()
 }
 
-/* These functions aren't used right now, but are here just in case they are needed in the future.
-func Backup() (l string, e error) {
-	backupcomm := exec.Command("cp", "-v", "cactusbot", "cactusbot.old")
-	backupcomm.Dir = "../cactusbot/"
-	backupcomm.Stdout = UtilWriter{}
-	backupcomm.Stderr = UtilWriter{}
-	
-	fmt.Println("$ cp -v cactusbot cactusbot.old")
-	bytes, err := backupcomm.CombinedOutput()
-	l = string(bytes)
-	if err != nil {
-		e = errors.New("Error backing up!")
-		return
-	}
-
-	e = nil
-	return
-}
-
-func Revert() (l string, e error) {
-	revertcomm := exec.Command("cp", "-v", "cactusbot.old", "cactusbot")
-	revertcomm.Dir = "../cactusbot/"
-	revertcomm.Stdout = UtilWriter{}
-	revertcomm.Stderr = UtilWriter{}
-	
-	fmt.Println("$ cp -v cactusbot.old cactusbot")
-	bytes, err := revertcomm.CombinedOutput()
-	l = string(bytes)
-	if err != nil {
-		e = errors.New("Error restoring from backup!")
-		return
-	}
-
-	e = nil
-	return
-}
-*/
-
 func PullRepo() (l string, e error) {
 	gitcomm := exec.Command("git", "pull")
 	gitcomm.Dir = "../cactusbot/"
-	gitcomm.Stdout = UtilWriter{}
-	gitcomm.Stderr = UtilWriter{}
+
+	var combinedlog []string
+	
+	gitcomm.Stdout = UtilWriter{
+		Log: &combinedlog,
+	}
+	gitcomm.Stderr = UtilWriter{
+		Log: &combinedlog,
+	}
 
 	fmt.Println("$ git pull")
-	bytes, err := gitcomm.CombinedOutput()
-	l = string(bytes)
+	err := gitcomm.Run()
+	l = strings.Join(combinedlog, "")
 	if err != nil {
-		e = errors.New("Error pulling repository!")
+		e = errors.New(fmt.Sprintf("Error pulling repository: %v", err))
 		return
 	}
 	
@@ -101,14 +71,21 @@ func PullRepo() (l string, e error) {
 func BuildBot() (l string, e error) {
 	gocomm := exec.Command("go", "build")
 	gocomm.Dir = "../cactusbot/"
-	gocomm.Stdout = UtilWriter{}
-	gocomm.Stderr = UtilWriter{}
+
+	var combinedlog []string
+	
+	gocomm.Stdout = UtilWriter{
+		Log: &combinedlog,
+	}
+	gocomm.Stderr = UtilWriter{
+		Log: &combinedlog,
+	}
 
 	fmt.Println("$ go build")
-	bytes, err := gocomm.CombinedOutput()
-	l = string(bytes)
+	err := gocomm.Run()
+	l = strings.Join(combinedlog, "")
 	if err != nil {
-		e = errors.New("Error building bot!")
+		e = errors.New(fmt.Sprintf("Error building bot: %v", err))
 		return
 	}
 
