@@ -90,7 +90,7 @@ func UpdateBot(msg *discordgo.MessageCreate, s *discordgo.Session) {
 
 	bytes, err := gitcomm.CombinedOutput()
 	if err != nil {
-		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git clone\n%v\n```\n**Failed.** Restarting bot.", string(bytes)))
+		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git pull\n%v\n```\n**Failed.** Restarting bot.", string(bytes)))
 		StartBot()
 		return
 	}
