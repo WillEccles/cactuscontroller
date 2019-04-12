@@ -23,7 +23,7 @@ func UpdateBot(msg *discordgo.MessageCreate, s *discordgo.Session) {
 	}
 	
 	log.Println("Successfully pulled from repository.")
-	s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git clone\n%v\n```\n", string(bytes)))
+	s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git pull\n%v\n```\n", string(bytes)))
 
 	log.Println("Building bot...")
 	bytes, err = BuildBot()
