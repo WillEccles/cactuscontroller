@@ -4,7 +4,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"log"
 	"strings"
+	"regexp"
 	"fmt"
+	"time"
 )
 
 func shutdownhandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
@@ -96,8 +98,62 @@ func restarthandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
 }
 
 func loghandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
-	_, err := s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n%v\n```", strings.Join(ProcLog, "")))
+	re := regexp.MustCompile(`(?i)^cc\s+log\s*`)
+	clean := re.ReplaceAllString(msg.Content, "")
+	clean = strings.TrimSpace(strings.ToLower(clean))
+	
+	dobot := false
+	docontroller := false
+
+	if clean == "" || clean == "all" {
+		dobot = true
+		docontroller = true
+	} else if clean == "bot" {
+		dobot = true
+	} else if clean == "controller" {
+		docontroller = true
+	}
+
+	if docontroller {
+		cl := GetControllerLogs()
+
+		for i, str := range(cl) {
+			partno := ""
+			if len(cl) > 1 {
+				partno = fmt.Sprintf(" (part %v/%v)", i+1, len(cl))
+			}
+			_, err := s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("Controller Logs%s:\n%s", partno, str))
+			if err != nil {
+				log.Printf("Error sending message in loghandler:\n%v\n", err)
+			}
+			time.Sleep(500 * time.Millisecond) // just to make sure we don't get ratelimited or something
+		}
+	}
+
+	if dobot {
+		bl := GetBotLogs()
+		
+		for i, str := range(bl) {
+			partno := ""
+			if len(bl) > 1 {
+				partno = fmt.Sprintf(" (part %v/%v)", i+1, len(bl))
+			}
+			_, err := s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("Bot Logs%s:\n%s", partno, str))
+			if err != nil {
+				log.Printf("Error sending message in loghandler:\n%v\n", err)
+			}
+			time.Sleep(500 * time.Millisecond) // just to make sure we don't get ratelimited or something
+		}
+	}
+}
+
+func helphandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
+	embedcolor := s.State.UserColor(s.State.User.ID, msg.ChannelID)
+	embed := HelpEmbed
+	embed.Color = embedcolor
+
+	_, err := s.ChannelMessageSendEmbed(msg.ChannelID, &embed)
 	if err != nil {
-		log.Printf("Error in loghandler:\n%v\n", err)
+		log.Printf("Error in helphandler:\n%v\n", err)
 	}
 }

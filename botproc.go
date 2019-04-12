@@ -3,9 +3,7 @@ package main
 import (
 	"log"
 	"os/exec"
-	"fmt"
 	"syscall"
-	"github.com/bwmarrin/discordgo"
 )
 
 var BotCmd *exec.Cmd

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"errors"
+	"github.com/bwmarrin/discordgo"
 )
 
 // this one requires inputs to allow logging in the discord channel

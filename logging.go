@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"strings"
+	"fmt"
 )
 
 const MaxLogBuffer = 40 // max lines of controller/bot logs to store (each)
@@ -27,7 +27,7 @@ func (bw BotWriter) Write(p []byte) (n int, err error) {
 }
 
 func (uw UtilWriter) Write(p []byte) (n int, err error) {
-	if len(ControllerLog) != MaxOutputBuffer {
+	if len(ControllerLog) != MaxLogBuffer {
 		ControllerLog = append(ControllerLog, string(p))
 	} else {
 		ControllerLog = append(ControllerLog[1:], string(p))
@@ -38,7 +38,7 @@ func (uw UtilWriter) Write(p []byte) (n int, err error) {
 }
 
 func (cl ControllerLogger) Write(p []byte) (n int, err error) {
-	if len(ControllerLog) != MaxOutputBuffer {
+	if len(ControllerLog) != MaxLogBuffer {
 		ControllerLog = append(ControllerLog, string(p))
 	} else {
 		ControllerLog = append(ControllerLog[1:], string(p))
@@ -62,21 +62,23 @@ func GetControllerLogs() (out []string) {
 
 // same as GetControllerLogs but for the bot
 func GetBotLogs() (out []string) {
-	return getLogs(BotLog)
+	return getLogs(ProcLog)
 }
 
 // backend for the above two functions
-func getLogs(in []string) {
-	charcount := 7 // start with 7 because ```\n and ```
+func getLogs(in []string) (out []string) {
+	charcount := 30 // start with 30 just to be sure
 	tempstr := ""
 	for _, s := range(in) {
-		if charcount + len(s) > MaxLogBuffer {
+		if charcount + len(s) > CharacterLimit {
 			out = append(out, fmt.Sprintf("```\n%s```", tempstr))
-			charcount = 7
+			charcount = 30
 			tempstr = ""
 		}
 		charcount += len(s)
 		tempstr += s
 	}
+	// one more to catch the last little bit
+	out = append(out, fmt.Sprintf("```\n%s```", tempstr))
 	return
 }

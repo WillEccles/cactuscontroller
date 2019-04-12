@@ -37,6 +37,7 @@ var firstReady bool
 
 func main() {
 	firstReady = true
+	InitLogger()
 
 	if token == "" {
 		log.Println("No controller token provided. Please run: cactuscontroller -t <controllertoken> -b <bottoken>")
@@ -97,7 +98,6 @@ func main() {
 	defer dg.Close() // close the session after Control-C
 	defer EndProc()
 
-	log.Println("Controller is now running. Press Control+C to exit.")
 	SigChan = make(chan os.Signal)
 	signal.Notify(SigChan, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-SigChan

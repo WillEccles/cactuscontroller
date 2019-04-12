@@ -63,4 +63,10 @@ var Commands = []Command {
 		Pattern: regexp.MustCompile(`(?i)^cc\s+log(\s+(bot|controller|all))?`),
 		Handler: loghandler,
 	},
+	{
+		Name: "help",
+		Description: "Shows the list of commands.",
+		Pattern: regexp.MustCompile(`(?i)^cc\s+help`),
+		Handler: helphandler,
+	},
 }
