@@ -64,6 +64,12 @@ var Commands = []Command {
 		Handler: loghandler,
 	},
 	{
+		Name: "conf <get|set> [msg]",
+		Description: "When using `get`, any message will be ignored and the bot's current config.json will be dumped to the chat. When using `set`, a message is required and will completely overwrite the config file. Use carefully.",
+		Pattern: regexp.MustCompile(`(?i)^cc\s+conf\s+(get|set).*`),
+		Handler: confhandler,
+	},
+	{
 		Name: "help",
 		Description: "Shows the list of commands.",
 		Pattern: regexp.MustCompile(`(?i)^cc\s+help`),
