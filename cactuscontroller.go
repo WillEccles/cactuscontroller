@@ -16,6 +16,7 @@ const (
 	/*Perms = 8 // admin
 	ClientID = "565946505026863145"
 	InvURL = "https://discordapp.com/oauth2/authorize?&client_id=%v&scope=bot&permissions=%v"*/
+	// TODO copy json config stuff from cactusbot to here
 	ConsoleChannel = "565947628718915587"
 	DebugChannel = "245649734302302208"
 	AdminID = "111943010396229632"
@@ -25,7 +26,6 @@ const (
 
 func init() {
 	flag.StringVar(&token, "t", "", "Controller Token")
-	flag.StringVar(&BotToken, "b", "", "Bot Token")
 	flag.Parse()
 }
 
@@ -41,11 +41,6 @@ func main() {
 
 	if token == "" {
 		log.Println("No controller token provided. Please run: cactuscontroller -t <controllertoken> -b <bottoken>")
-		return
-	}
-
-	if BotToken == "" {
-		log.Println("No child token supplied. Please run: cactuscontroller -t <controllertoken> -b <bottoken>")
 		return
 	}
 

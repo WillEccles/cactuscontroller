@@ -21,7 +21,7 @@ func StartBot() {
 		return
 	}
 
-	BotCmd = exec.Command("./cactusbot", "-t", BotToken)
+	BotCmd = exec.Command("./cactusbot")
 	BotCmd.Dir = "../cactusbot/"
 
 	ProcLog = nil
