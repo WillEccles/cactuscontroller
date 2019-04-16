@@ -20,6 +20,13 @@ func StartBot() {
 		return
 	}
 
+	// wait for the bot to shut down
+	if BotStatus == BotStopping {
+		log.Println("StartBot(): Waiting for bot to shutdown...")
+		for BotStatus == BotStopping { }
+		log.Println("StartBot(): Bot shutdown.")
+	}
+
 	BotCmd = exec.Command("./cactusbot")
 	BotCmd.Dir = "../cactusbot/"
 
