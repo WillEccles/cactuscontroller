@@ -8,7 +8,6 @@ import (
 
 var BotCmd *exec.Cmd
 var BotStatus int
-var CanCommand bool // whether or not admin commands can be handled at the moment
 
 const (
 	BotRunning = 1 << 0
@@ -24,18 +23,32 @@ func StartBot() {
 	BotCmd = exec.Command("./cactusbot")
 	BotCmd.Dir = "../cactusbot/"
 
-	ProcLog = nil
-
 	BotCmd.Stdout = BotWriter{}
 	BotCmd.Stderr = BotWriter{}
 
 	err := BotCmd.Start()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	BotStatus = BotRunning
 	log.Println("Started bot process.")
+	
+	go func() {
+		err = BotCmd.Wait()
+		if err != nil {
+			log.Println("Error in StartBot go func(): ", err)
+		}
+		if BotStatus != BotStopping {
+			log.Println("Bot just died, attempting to restart it.")
+			BotStatus = BotStopped
+			StartBot()
+		} else {
+			BotStatus = BotStopped
+			log.Println("Bot process stopped.")
+		}
+	}()
 }
 
 func StopBot() {
@@ -46,16 +59,9 @@ func StopBot() {
 	BotStatus = BotStopping
 	err := BotCmd.Process.Signal(syscall.SIGTERM)
 	if err != nil {
-		log.Fatal("Error in StopBot: ", err)
+		log.Println("Error in StopBot: ", err)
 	}
 
-	err = BotCmd.Wait()
-	if err != nil {
-		log.Fatal("Error in StopBot: ", err)
-	}
-
-	BotStatus = BotStopped
-	log.Println("Bot process stopped.")
 }
 
 func RestartBot() {
@@ -76,7 +82,6 @@ func InitProc() {
 	}
 
 	BotStatus = BotStopped
-	CanCommand = true
 
 	initialized = true
 }
