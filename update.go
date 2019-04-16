@@ -18,7 +18,7 @@ func UpdateBot(msg *discordgo.MessageCreate, s *discordgo.Session) {
 	if err != nil {
 		log.Println("Error pulling repository! Will restart bot.")
 		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ git pull\n%v\n```\n**Failed.** Restarting bot.", string(bytes)))
-		StartBot()
+		StartBot(s)
 		return
 	}
 	
@@ -30,7 +30,7 @@ func UpdateBot(msg *discordgo.MessageCreate, s *discordgo.Session) {
 	if err != nil {
 		log.Println("Error building bot! Will restart bot.")
 		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("```\n$ go build\n%v\n```\n**Failed.** Restarting bot.", string(bytes)))
-		StartBot()
+		StartBot(s)
 		return
 	}
 
@@ -40,7 +40,7 @@ func UpdateBot(msg *discordgo.MessageCreate, s *discordgo.Session) {
 	log.Println("Upgrade successful, restarting bot...")
 	s.ChannelMessageSend(msg.ChannelID, "Upgrade successful, starting bot.")
 
-	StartBot()
+	StartBot(s)
 }
 
 func PullRepo() (l string, e error) {

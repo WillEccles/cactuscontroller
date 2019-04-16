@@ -61,7 +61,7 @@ func starthandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
 		return
 	}
 
-	StartBot()
+	StartBot(s)
 
 	_, err = s.ChannelMessageSend(msg.ChannelID, "Started bot.")
 	if err != nil {
@@ -83,14 +83,14 @@ func restarthandler(msg *discordgo.MessageCreate, s *discordgo.Session) {
 
 	if BotStatus == BotRunning {
 		StopBot()
-		StartBot()
+		StartBot(s)
 
 		_, err := s.ChannelMessageSend(msg.ChannelID, "Restarted bot.")
 		if err != nil {
 			log.Printf("Error in restarthandler:\n%v\n", err)
 		}
 	} else {
-		StartBot()
+		StartBot(s)
 		
 		_, err := s.ChannelMessageSend(msg.ChannelID, "Started bot.")
 		if err != nil {

@@ -2,8 +2,10 @@ package main
 
 import (
 	"log"
+	"fmt"
 	"os/exec"
 	"syscall"
+	"github.com/bwmarrin/discordgo"
 )
 
 var BotCmd *exec.Cmd
@@ -15,7 +17,7 @@ const (
 	BotStopping = 1 << 2
 )
 
-func StartBot() {
+func StartBot(s *discordgo.Session) {
 	if BotStatus == BotRunning {
 		return
 	}
@@ -49,8 +51,15 @@ func StartBot() {
 		}
 		if BotStatus != BotStopping {
 			log.Println("Bot just died, attempting to restart it.")
+			s.ChannelMessageSend(DebugChannel, fmt.Sprintf("Bot just crashed, trying to restart! <@%v>", AdminID))
+			loghandler(&discordgo.MessageCreate{
+				&discordgo.Message{
+					ChannelID: DebugChannel,
+					Content: "cc log bot",
+				},
+			}, s)
 			BotStatus = BotStopped
-			StartBot()
+			StartBot(s)
 		} else {
 			BotStatus = BotStopped
 			log.Println("Bot process stopped.")
@@ -71,10 +80,10 @@ func StopBot() {
 
 }
 
-func RestartBot() {
+func RestartBot(s *discordgo.Session) {
 	log.Println("Restarting bot process.")
 	StopBot()
-	StartBot()
+	StartBot(s)
 }
 
 func EndProc() {

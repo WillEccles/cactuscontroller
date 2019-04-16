@@ -121,7 +121,7 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 		firstReady = false
 
 		// start the bot since we know we should now
-		StartBot()
+		StartBot(s)
 	}
 }
 
@@ -149,7 +149,7 @@ func disconnect(s *discordgo.Session, event *discordgo.Disconnect) {
 
 func resume(s *discordgo.Session, event *discordgo.Resumed) {
 	log.Println("Controller resumed, attempting to send debug message.")
-	_, err := s.ChannelMessageSend(DebugChannel, fmt.Sprintf("Just recovered from error(s)!\n```\n%v\n```", AdminID, strings.Join(event.Trace, "\n")))
+	_, err := s.ChannelMessageSend(DebugChannel, fmt.Sprintf("Just recovered from error(s)!\n```\n%v\n```", strings.Join(event.Trace, "\n")))
 	if err != nil {
 		log.Printf("Error in resume (this is awkward):\n%v\n", err)
 	}
